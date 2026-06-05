@@ -16,7 +16,7 @@ import type { DashboardFilters } from "@/lib/dashboard";
 
 export default function Index() {
   const { data: filterOptions } = useDashboardFilterOptions();
-  const dashboardDevices = ["AGFW26009"];
+  const dashboardDevices = ["AGFW26010", "CFSO13"];
   const [appliedFilters, setAppliedFilters] = useState<DashboardFilters>({
     devices: dashboardDevices,
     mealTypes: [],

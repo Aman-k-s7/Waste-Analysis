@@ -115,7 +115,7 @@ function MultiSelectDropdown({
 }
 
 
-const FIXED_DEVICE_SERIAL = "AGFW26009";
+const FIXED_DEVICE_SERIALS = ["AGFW26010", "CFSO13"];
 
 interface FilterSidebarProps {
   options?: FilterOptions;
@@ -159,7 +159,7 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
     onApply({
       dateFrom: finalDateFrom,
       dateTo: finalDateTo,
-      devices: [FIXED_DEVICE_SERIAL],
+      devices: FIXED_DEVICE_SERIALS,
       mealTypes: meals,
       categories,
       weeks,
@@ -173,7 +173,7 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
     setCategories([]);
     setWeeks([]);
     onApply({
-      devices: [FIXED_DEVICE_SERIAL],
+      devices: FIXED_DEVICE_SERIALS,
       mealTypes: [],
       categories: [],
       weeks: [],
