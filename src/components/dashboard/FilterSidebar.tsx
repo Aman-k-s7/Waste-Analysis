@@ -126,6 +126,7 @@ interface FilterSidebarProps {
 export default function FilterSidebar({ options, onApply }: FilterSidebarProps) {
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
+  const [devices, setDevices] = useState<string[]>(FIXED_DEVICE_SERIALS);
   const [meals, setMeals] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [weeks, setWeeks] = useState<string[]>([]);
@@ -134,11 +135,13 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
     if (!options) return;
     setDateFrom(undefined);
     setDateTo(undefined);
+    setDevices(FIXED_DEVICE_SERIALS);
     setMeals([]);
     setCategories([]);
     setWeeks([]);
   }, [options]);
 
+  const deviceOptions = useMemo<DropdownOption[]>(() => FIXED_DEVICE_SERIALS.map((id) => ({ label: id, value: id })), []);
   const mealOptions = useMemo<DropdownOption[]>(() => (options?.meal_types ?? []).map((item) => ({ label: item, value: item })), [options?.meal_types]);
   const categoryOptions = useMemo<DropdownOption[]>(() => (options?.categories ?? []).map((item) => ({ label: item, value: item })), [options?.categories]);
   const weekOptions = useMemo<DropdownOption[]>(() => (options?.weeks ?? []).map((item) => ({ label: item.label, value: item.value })), [options?.weeks]);
@@ -159,7 +162,7 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
     onApply({
       dateFrom: finalDateFrom,
       dateTo: finalDateTo,
-      devices: FIXED_DEVICE_SERIALS,
+      devices: devices.length ? devices : FIXED_DEVICE_SERIALS,
       mealTypes: meals,
       categories,
       weeks,
@@ -169,6 +172,7 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
   const reset = () => {
     setDateFrom(undefined);
     setDateTo(undefined);
+    setDevices(FIXED_DEVICE_SERIALS);
     setMeals([]);
     setCategories([]);
     setWeeks([]);
@@ -190,6 +194,17 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Device</label>
+          <MultiSelectDropdown
+            label="Devices"
+            placeholder="All devices"
+            options={deviceOptions}
+            selected={devices}
+            onChange={setDevices}
+          />
+        </div>
+
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Date Range</label>
           <div className="space-y-1.5">
