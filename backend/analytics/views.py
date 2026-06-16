@@ -22,6 +22,9 @@ from analytics.services.dashboard import (
     get_weekday_comparison_grid,
     get_waste_by_category,
     get_weekly_waste,
+    get_usage_analytics,
+    get_bain_marie_analytics,
+    get_daily_avg_by_category,
 )
 from analytics.services.filters import FilterParams, parse_filters
 
@@ -39,6 +42,9 @@ def _normalize_chat_filters(raw_filters: dict) -> dict:
     if "mealTypes" in normalized and "meal_types" not in normalized:
         value = normalized.get("mealTypes")
         normalized["meal_types"] = ",".join(value) if isinstance(value, list) else value
+    if "wasteTypes" in normalized and "waste_types" not in normalized:
+        value = normalized.get("wasteTypes")
+        normalized["waste_types"] = ",".join(value) if isinstance(value, list) else value
     if "weeks" in normalized:
         value = normalized.get("weeks")
         if isinstance(value, list):
@@ -245,6 +251,39 @@ def moisture_data(request: HttpRequest) -> JsonResponse:
     limit = request.GET.get("limit")
     try:
         payload = get_moisture_data(filters, limit=int(limit) if limit and limit.isdigit() else 250)
+    except DatabaseError as exc:
+        return _database_error_response(exc)
+    return JsonResponse(payload, safe=False)
+
+
+@require_GET
+def usage_analytics(request: HttpRequest) -> JsonResponse:
+    try:
+        payload = get_usage_analytics(_parse_request_filters(request))
+    except ValidationError as exc:
+        return _invalid_filters_response(exc)
+    except DatabaseError as exc:
+        return _database_error_response(exc)
+    return JsonResponse(payload)
+
+
+@require_GET
+def bain_marie_analytics(request: HttpRequest) -> JsonResponse:
+    try:
+        payload = get_bain_marie_analytics(_parse_request_filters(request))
+    except ValidationError as exc:
+        return _invalid_filters_response(exc)
+    except DatabaseError as exc:
+        return _database_error_response(exc)
+    return JsonResponse(payload)
+
+
+@require_GET
+def daily_avg_by_category(request: HttpRequest) -> JsonResponse:
+    try:
+        payload = get_daily_avg_by_category(_parse_request_filters(request))
+    except ValidationError as exc:
+        return _invalid_filters_response(exc)
     except DatabaseError as exc:
         return _database_error_response(exc)
     return JsonResponse(payload, safe=False)

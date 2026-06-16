@@ -46,7 +46,7 @@ export default function ChatBar({ filters }: ChatBarProps) {
   }
 
   return (
-    <div className="chart-card space-y-3">
+    <div className="chart-card space-y-3 no-print">
       <div className="flex items-center gap-3">
         <div className="flex-1 flex items-center gap-2 bg-background border border-border rounded px-3 py-2">
           <span className="text-sm">🤖</span>

@@ -130,6 +130,7 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
   const [meals, setMeals] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [weeks, setWeeks] = useState<string[]>([]);
+  const [wasteTypes, setWasteTypes] = useState<string[]>([]);
 
   useEffect(() => {
     if (!options) return;
@@ -139,11 +140,13 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
     setMeals([]);
     setCategories([]);
     setWeeks([]);
+    setWasteTypes([]);
   }, [options]);
 
   const deviceOptions = useMemo<DropdownOption[]>(() => FIXED_DEVICE_SERIALS.map((id) => ({ label: id, value: id })), []);
   const mealOptions = useMemo<DropdownOption[]>(() => (options?.meal_types ?? []).map((item) => ({ label: item, value: item })), [options?.meal_types]);
   const categoryOptions = useMemo<DropdownOption[]>(() => (options?.categories ?? []).map((item) => ({ label: item, value: item })), [options?.categories]);
+  const wasteTypeOptions = useMemo<DropdownOption[]>(() => (options?.waste_types ?? []).map((item) => ({ label: item, value: item })), [options?.waste_types]);
   const weekOptions = useMemo<DropdownOption[]>(() => (options?.weeks ?? []).map((item) => ({ label: item.label, value: item.value })), [options?.weeks]);
 
   const apply = () => {
@@ -166,6 +169,7 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
       mealTypes: meals,
       categories,
       weeks,
+      wasteTypes,
     });
   };
 
@@ -176,16 +180,18 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
     setMeals([]);
     setCategories([]);
     setWeeks([]);
+    setWasteTypes([]);
     onApply({
       devices: FIXED_DEVICE_SERIALS,
       mealTypes: [],
       categories: [],
       weeks: [],
+      wasteTypes: [],
     });
   };
 
   return (
-    <aside className="w-64 shrink-0 bg-card border-r border-border h-screen sticky top-0 flex flex-col">
+    <aside className="w-64 shrink-0 bg-card border-r border-border h-screen sticky top-0 flex flex-col no-print">
       <div className="px-4 py-4 border-b border-border">
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-primary" />
@@ -254,6 +260,18 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
             selected={categories}
             onChange={setCategories}
             searchPlaceholder="Search categories..."
+          />
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Waste Type</label>
+          <MultiSelectDropdown
+            label="Waste types"
+            placeholder="All waste types"
+            options={wasteTypeOptions}
+            selected={wasteTypes}
+            onChange={setWasteTypes}
+            searchPlaceholder="Search waste types..."
           />
         </div>
 

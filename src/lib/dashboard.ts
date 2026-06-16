@@ -5,6 +5,7 @@ export interface DashboardFilters {
   mealTypes: string[];
   categories: string[];
   weeks: string[];
+  wasteTypes: string[];
 }
 
 export interface DashboardSummary {
@@ -54,6 +55,7 @@ export interface FilterOptions {
   devices: string[];
   meal_types: string[];
   categories: string[];
+  waste_types: string[];
   weeks: FilterWeek[];
   min_date: string | null;
   max_date: string | null;
@@ -74,6 +76,24 @@ export interface WeekdayComparisonGrid {
   }>;
 }
 
+export interface UsageAnalytics {
+  total_scans: number;
+  active_days: number;
+  scans_per_day: number;
+  total_devices: number;
+  scans_by_meal: NamedValue[];
+  scans_by_waste_type: NamedValue[];
+}
+
+export interface BainMarieAnalytics {
+  total_waste: number;
+  daily_avg: number;
+  active_days: number;
+  top_food_items: NamedValue[];
+  by_meal: NamedValue[];
+  daily_trend: Array<{ date: string; value: number }>;
+}
+
 
 function buildParams(filters: DashboardFilters): URLSearchParams {
   const params = new URLSearchParams();
@@ -83,6 +103,7 @@ function buildParams(filters: DashboardFilters): URLSearchParams {
   if (filters.devices.length) params.set("devices", filters.devices.join(","));
   if (filters.mealTypes.length) params.set("meal_types", filters.mealTypes.join(","));
   if (filters.categories.length) params.set("categories", filters.categories.join(","));
+  if (filters.wasteTypes?.length) params.set("waste_types", filters.wasteTypes.join(","));
   return params;
 }
 
@@ -111,6 +132,9 @@ export const dashboardApi = {
   getTopDevices: (filters: DashboardFilters) => fetchJson<NamedValue[]>("top-devices", filters),
   getInsights: (filters: DashboardFilters) => fetchJson<DashboardInsights>("dashboard-insights", filters),
   getFilterOptions: () => fetchJson<FilterOptions>("filter-options"),
+  getUsageAnalytics: (filters: DashboardFilters) => fetchJson<UsageAnalytics>("usage-analytics", filters),
+  getBainMarieAnalytics: (filters: DashboardFilters) => fetchJson<BainMarieAnalytics>("bain-marie-analytics", filters),
+  getDailyAvgByCategory: (filters: DashboardFilters) => fetchJson<NamedValue[]>("daily-avg-by-category", filters),
   getMealBreakdown: async (filters: DashboardFilters, wasteTypes: string[]) => {
     const params = buildParams(filters);
     if (wasteTypes.length) params.set("waste_types", wasteTypes.join(","));
@@ -140,6 +164,7 @@ export const dashboardApi = {
       devices: filters.devices.join(","),
       meal_types: filters.mealTypes.join(","),
       categories: filters.categories.join(","),
+      waste_types: (filters.wasteTypes ?? []).join(","),
     };
     const response = await fetch("/api/chat-query", {
       method: "POST",

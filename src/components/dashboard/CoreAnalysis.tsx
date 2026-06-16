@@ -41,7 +41,7 @@ export default function CoreAnalysis({ filters, foodItems, wasteCategories, topD
         <MealTypeBreakdown filters={filters} />
 
         <div className="chart-card">
-          <h3 className="section-title">Waste Produced per Device</h3>
+          <h3 className="section-title">Waste Produced per Site</h3>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={topDevices} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 100 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,13%,90%)" />

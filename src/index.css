@@ -82,3 +82,23 @@
     @apply bg-destructive/10 text-destructive;
   }
 }
+
+@media print {
+  aside,
+  .no-print {
+    display: none !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background: white;
+  }
+
+  main {
+    overflow: visible !important;
+  }
+}
