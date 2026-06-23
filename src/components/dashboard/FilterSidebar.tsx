@@ -117,6 +117,11 @@ function MultiSelectDropdown({
 
 const FIXED_DEVICE_SERIALS = ["AGFW26010", "CFSO13"];
 
+const DEVICE_NAMES: Record<string, string> = {
+  "AGFW26010": "Morgan Stanley",
+  "CFSO13": "Morgan Stanley 2",
+};
+
 interface FilterSidebarProps {
   options?: FilterOptions;
   onApply: (filters: DashboardFilters) => void;
@@ -143,7 +148,7 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
     setWasteTypes([]);
   }, [options]);
 
-  const deviceOptions = useMemo<DropdownOption[]>(() => FIXED_DEVICE_SERIALS.map((id) => ({ label: id, value: id })), []);
+  const deviceOptions = useMemo<DropdownOption[]>(() => FIXED_DEVICE_SERIALS.map((id) => ({ label: DEVICE_NAMES[id] || id, value: id })), []);
   const mealOptions = useMemo<DropdownOption[]>(() => (options?.meal_types ?? []).map((item) => ({ label: item, value: item })), [options?.meal_types]);
   const categoryOptions = useMemo<DropdownOption[]>(() => (options?.categories ?? []).map((item) => ({ label: item, value: item })), [options?.categories]);
   const wasteTypeOptions = useMemo<DropdownOption[]>(() => (options?.waste_types ?? []).map((item) => ({ label: item, value: item })), [options?.waste_types]);
