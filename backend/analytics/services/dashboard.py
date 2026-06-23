@@ -55,7 +55,7 @@ def _where_clause(
     require_commodity: bool = True,
     require_created_on_date: bool = True,
 ) -> tuple[str, list]:
-    clauses = ["company_id = %s"]
+    clauses = ["company_id = %s", "is_valid = 1"]
     if require_commodity:
         clauses.append("commodity_name IS NOT NULL")
     if require_created_on_date:
