@@ -229,28 +229,6 @@ def chat_query(request: HttpRequest) -> JsonResponse:
 
 
 @require_GET
-def debug_may25(request: HttpRequest) -> JsonResponse:
-    from django.db import connection as _conn
-    import os as _os
-    table = _os.getenv("WASTE_SCAN_TABLE", "scm_scans")
-    company = int(_os.getenv("WASTE_COMPANY_ID", "312"))
-    date_param = request.GET.get("date", "2026-05-25")
-    with _conn.cursor() as c:
-        c.execute(
-            f"SELECT id, device_serial_no, created_on_date, commodity_name, weight, "
-            f"CASE WHEN JSON_VALID(request) THEN JSON_UNQUOTE(JSON_EXTRACT(request, '$.scan_data.weight')) ELSE NULL END AS req_weight, "
-            f"CASE WHEN JSON_VALID(request) THEN JSON_UNQUOTE(JSON_EXTRACT(request, '$.scan_data.day_part')) ELSE NULL END AS day_part, "
-            f"CASE WHEN JSON_VALID(request) THEN JSON_UNQUOTE(JSON_EXTRACT(request, '$.scan_data.food_waste_type')) ELSE NULL END AS waste_type "
-            f"FROM `{table}` WHERE company_id = %s AND device_serial_no IN ('AGFW26010','CFSO13') "
-            f"AND created_on_date = %s ORDER BY id",
-            [company, date_param]
-        )
-        cols = [d[0] for d in c.description]
-        rows = [{cols[i]: (str(v) if v is not None else None) for i, v in enumerate(row)} for row in c.fetchall()]
-    return JsonResponse({"date": date_param, "total": len(rows), "rows": rows})
-
-
-@require_GET
 def reason_breakdown(request: HttpRequest) -> JsonResponse:
     try:
         filters = _parse_request_filters(request)
