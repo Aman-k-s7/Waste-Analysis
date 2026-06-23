@@ -229,6 +229,67 @@ def chat_query(request: HttpRequest) -> JsonResponse:
 
 
 @require_GET
+def debug_scan_count(request: HttpRequest) -> JsonResponse:
+    """Temporary diagnostic endpoint — remove after investigation."""
+    from django.db import connection as _conn
+    import os as _os
+    table = _os.getenv("WASTE_SCAN_TABLE", "scm_scans")
+    company = int(_os.getenv("WASTE_COMPANY_ID", "312"))
+    devices = ("AGFW26010", "CFSO13")
+    ph = ", ".join(["%s"] * len(devices))
+    results = {}
+    with _conn.cursor() as c:
+        # 1. Total with current filters (is_valid=1, commodity, date)
+        try:
+            c.execute(
+                f"SELECT COUNT(*) FROM `{table}` WHERE company_id=%s AND is_valid=1"
+                f" AND commodity_name IS NOT NULL AND created_on_date IS NOT NULL"
+                f" AND device_serial_no IN ({ph})",
+                [company, *devices]
+            )
+            results["count_is_valid_1"] = c.fetchone()[0]
+        except Exception as e:
+            results["count_is_valid_1"] = f"ERROR: {e}"
+
+        # 2. Total without is_valid filter
+        try:
+            c.execute(
+                f"SELECT COUNT(*) FROM `{table}` WHERE company_id=%s"
+                f" AND commodity_name IS NOT NULL AND created_on_date IS NOT NULL"
+                f" AND device_serial_no IN ({ph})",
+                [company, *devices]
+            )
+            results["count_no_is_valid"] = c.fetchone()[0]
+        except Exception as e:
+            results["count_no_is_valid"] = f"ERROR: {e}"
+
+        # 3. Check if is_valid column exists
+        try:
+            c.execute(
+                f"SELECT COUNT(*) FROM `{table}` WHERE company_id=%s AND device_serial_no IN ({ph}) AND is_valid IS NOT NULL LIMIT 1",
+                [company, *devices]
+            )
+            results["is_valid_column_exists"] = True
+        except Exception:
+            results["is_valid_column_exists"] = False
+
+        # 4. Rows on May 25 with is_valid != 1
+        try:
+            c.execute(
+                f"SELECT id, device_serial_no, is_valid, commodity_name, weight, created_on_date"
+                f" FROM `{table}` WHERE company_id=%s AND device_serial_no IN ({ph})"
+                f" AND created_on_date='2026-05-25'",
+                [company, *devices]
+            )
+            cols = [d[0] for d in c.description]
+            results["may25_rows"] = [dict(zip(cols, row)) for row in c.fetchall()]
+        except Exception as e:
+            results["may25_rows"] = f"ERROR: {e}"
+
+    return JsonResponse(results)
+
+
+@require_GET
 def reason_breakdown(request: HttpRequest) -> JsonResponse:
     try:
         filters = _parse_request_filters(request)
