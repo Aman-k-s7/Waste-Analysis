@@ -89,7 +89,7 @@ def _answer_from_intent(intent: str, context: dict[str, Any]) -> str | None:
             return "The dashboard does not show waste category data for the current filters."
         total = sum(float(item["value"]) for item in waste_categories) or 1
         parts = [
-            f"{item['name']}: {((float(item['value']) / total) * 100):.2f}%"
+            f"• {item['name']}: {((float(item['value']) / total) * 100):.2f}%"
             for item in waste_categories
         ]
         return "Waste is distributed as:\n" + "\n".join(parts)
@@ -110,7 +110,7 @@ def _answer_from_intent(intent: str, context: dict[str, Any]) -> str | None:
         anomalies = [item["date"] for item in trend if item["spike"]][:10]
         if not anomalies:
             return "No unusual high-waste days were detected for the current filters."
-        return "High waste was observed on:\n" + "\n".join(anomalies) + "\nThese are considered abnormal days."
+        return "High waste was observed on:\n• " + "\n• ".join(anomalies) + "\n\nThese are considered abnormal days."
     if intent == "current_week_total":
         if not weekly_waste:
             return "The dashboard does not show weekly waste for the current filters."

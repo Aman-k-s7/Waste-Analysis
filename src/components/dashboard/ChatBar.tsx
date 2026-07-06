@@ -88,7 +88,7 @@ export default function ChatBar({ filters }: ChatBarProps) {
       </div>
 
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
-      {answer ? <div className="rounded border border-border bg-background px-3 py-3 text-sm text-foreground leading-relaxed">{answer}</div> : null}
+      {answer ? <div className="rounded border border-border bg-background px-3 py-3 text-sm text-foreground leading-relaxed whitespace-pre-wrap">{answer}</div> : null}
     </div>
   );
 }
