@@ -115,7 +115,12 @@ function MultiSelectDropdown({
 }
 
 
-const FIXED_DEVICE_SERIALS = ["AGFW26010", "CFSO13"];
+const getInitialDevices = () => {
+  if (typeof window === "undefined") return ["AGFW26010", "CFSO13"];
+  const searchParams = new URLSearchParams(window.location.search);
+  const urlDevice = searchParams.get("device") || searchParams.get("devices");
+  return urlDevice ? urlDevice.split(",") : ["AGFW26010", "CFSO13"];
+};
 
 const DEVICE_NAMES: Record<string, string> = {
   "AGFW26010": "Morgan Stanley",
@@ -131,7 +136,7 @@ interface FilterSidebarProps {
 export default function FilterSidebar({ options, onApply }: FilterSidebarProps) {
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
-  const [devices, setDevices] = useState<string[]>(FIXED_DEVICE_SERIALS);
+  const [devices, setDevices] = useState<string[]>(getInitialDevices());
   const [meals, setMeals] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [weeks, setWeeks] = useState<string[]>([]);
@@ -141,14 +146,17 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
     if (!options) return;
     setDateFrom(undefined);
     setDateTo(undefined);
-    setDevices(FIXED_DEVICE_SERIALS);
+    setDevices(getInitialDevices());
     setMeals([]);
     setCategories([]);
     setWeeks([]);
     setWasteTypes([]);
   }, [options]);
 
-  const deviceOptions = useMemo<DropdownOption[]>(() => FIXED_DEVICE_SERIALS.map((id) => ({ label: DEVICE_NAMES[id] || id, value: id })), []);
+  const deviceOptions = useMemo<DropdownOption[]>(() => {
+    const available = options?.devices?.length ? options.devices : getInitialDevices();
+    return available.map((id) => ({ label: DEVICE_NAMES[id] || id, value: id }));
+  }, [options?.devices]);
   const mealOptions = useMemo<DropdownOption[]>(() => (options?.meal_types ?? []).map((item) => ({ label: item, value: item })), [options?.meal_types]);
   const categoryOptions = useMemo<DropdownOption[]>(() => (options?.categories ?? []).map((item) => ({ label: item, value: item })), [options?.categories]);
   const wasteTypeOptions = useMemo<DropdownOption[]>(() => (options?.waste_types ?? []).map((item) => ({ label: item, value: item })), [options?.waste_types]);
@@ -170,7 +178,7 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
     onApply({
       dateFrom: finalDateFrom,
       dateTo: finalDateTo,
-      devices: devices.length ? devices : FIXED_DEVICE_SERIALS,
+      devices: devices.length ? devices : getInitialDevices(),
       mealTypes: meals,
       categories,
       weeks,
@@ -181,13 +189,13 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
   const reset = () => {
     setDateFrom(undefined);
     setDateTo(undefined);
-    setDevices(FIXED_DEVICE_SERIALS);
+    setDevices(getInitialDevices());
     setMeals([]);
     setCategories([]);
     setWeeks([]);
     setWasteTypes([]);
     onApply({
-      devices: FIXED_DEVICE_SERIALS,
+      devices: getInitialDevices(),
       mealTypes: [],
       categories: [],
       weeks: [],

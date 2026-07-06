@@ -21,7 +21,11 @@ import type { DashboardFilters } from "@/lib/dashboard";
 
 export default function Index() {
   const { data: filterOptions } = useDashboardFilterOptions();
-  const dashboardDevices = ["AGFW26010", "CFSO13"];
+  
+  const searchParams = new URLSearchParams(window.location.search);
+  const urlDevice = searchParams.get("device") || searchParams.get("devices");
+  const dashboardDevices = urlDevice ? urlDevice.split(",") : ["AGFW26010", "CFSO13"];
+
   const [appliedFilters, setAppliedFilters] = useState<DashboardFilters>({
     devices: dashboardDevices,
     mealTypes: [],

@@ -18,7 +18,7 @@ def _table() -> str:
 
 def _json_value_expr(path: str) -> str:
     return (
-        f"CASE WHEN JSON_VALID(request) "
+        f"CASE WHEN JSON_VALID(request) "r
         f"THEN JSON_UNQUOTE(JSON_EXTRACT(request, '{path}')) "
         f"ELSE NULL END"
     )
