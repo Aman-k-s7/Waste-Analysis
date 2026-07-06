@@ -115,16 +115,28 @@ function MultiSelectDropdown({
 }
 
 
+const DEVICE_NAMES: Record<string, string> = {
+  "AGFW26010": "Morgan Stanley",
+  "CFSO13": "Morgan Stanley 2",
+};
+
+const NAME_TO_SERIAL: Record<string, string> = Object.entries(DEVICE_NAMES).reduce((acc, [serial, name]) => {
+  acc[name] = serial;
+  return acc;
+}, {} as Record<string, string>);
+
 const getInitialDevices = () => {
   if (typeof window === "undefined") return ["AGFW26010", "CFSO13"];
   const searchParams = new URLSearchParams(window.location.search);
   const urlDevice = searchParams.get("device") || searchParams.get("devices");
-  return urlDevice ? urlDevice.split(",") : ["AGFW26010", "CFSO13"];
-};
-
-const DEVICE_NAMES: Record<string, string> = {
-  "AGFW26010": "Morgan Stanley",
-  "CFSO13": "Morgan Stanley 2",
+  if (!urlDevice) return ["AGFW26010", "CFSO13"];
+  
+  return urlDevice.split(",").map(d => {
+    const trimmed = d.trim();
+    if (NAME_TO_SERIAL[trimmed]) return NAME_TO_SERIAL[trimmed];
+    if (trimmed === "CFS013") return "CFSO13";
+    return trimmed;
+  });
 };
 
 interface FilterSidebarProps {
@@ -154,7 +166,8 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
   }, [options]);
 
   const deviceOptions = useMemo<DropdownOption[]>(() => {
-    const available = options?.devices?.length ? options.devices : getInitialDevices();
+    const backendDevices = options?.devices || [];
+    const available = Array.from(new Set([...backendDevices, ...getInitialDevices()]));
     return available.map((id) => ({ label: DEVICE_NAMES[id] || id, value: id }));
   }, [options?.devices]);
   const mealOptions = useMemo<DropdownOption[]>(() => (options?.meal_types ?? []).map((item) => ({ label: item, value: item })), [options?.meal_types]);
