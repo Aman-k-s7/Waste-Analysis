@@ -22,13 +22,13 @@ export default function KpiStrip({ summary }: KpiStripProps) {
     <div className="space-y-4">
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {kpis.map((kpi) => (
-          <div key={kpi.label} className="kpi-card flex items-center gap-4 py-5">
+          <div key={kpi.label} className="kpi-card flex items-center gap-3">
             <div className={`${kpi.color} shrink-0`}>
-              <kpi.icon className="h-6 w-6" />
+              <kpi.icon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-muted-foreground truncate">{kpi.label}</p>
-              <p className="text-2xl font-bold leading-tight text-foreground mt-1">{kpi.value}</p>
+              <p className="text-xs font-medium text-muted-foreground truncate">{kpi.label}</p>
+              <p className="text-xl font-bold leading-tight text-foreground mt-0.5">{kpi.value}</p>
             </div>
           </div>
         ))}
