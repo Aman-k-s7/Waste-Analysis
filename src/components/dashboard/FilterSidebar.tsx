@@ -166,6 +166,13 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
   }, [options]);
 
   const deviceOptions = useMemo<DropdownOption[]>(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const urlDevice = searchParams.get("device") || searchParams.get("devices");
+    
+    if (urlDevice) {
+      return getInitialDevices().map((id) => ({ label: DEVICE_NAMES[id] || id, value: id }));
+    }
+    
     const backendDevices = options?.devices || [];
     const available = Array.from(new Set([...backendDevices, ...getInitialDevices()]));
     return available.map((id) => ({ label: DEVICE_NAMES[id] || id, value: id }));
