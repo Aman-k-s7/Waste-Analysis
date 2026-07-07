@@ -53,6 +53,8 @@ def _normalize_chat_filters(raw_filters: dict) -> dict:
         value = normalized.get(key)
         if isinstance(value, list):
             normalized[key] = ",".join(value)
+    if "customerId" in normalized and "customer_id" not in normalized:
+        normalized["customer_id"] = normalized.get("customerId")
     return normalized
 
 
@@ -198,7 +200,7 @@ def dashboard_insights(request: HttpRequest) -> JsonResponse:
 @require_GET
 def filter_options(request: HttpRequest) -> JsonResponse:
     try:
-        payload = get_filter_options()
+        payload = get_filter_options(_parse_request_filters(request))
     except DatabaseError as exc:
         return _database_error_response(exc)
     return JsonResponse(payload)

@@ -6,6 +6,7 @@ export interface DashboardFilters {
   categories: string[];
   weeks: string[];
   wasteTypes: string[];
+  customerId?: string;
 }
 
 export interface DashboardSummary {
@@ -104,6 +105,7 @@ function buildParams(filters: DashboardFilters): URLSearchParams {
   if (filters.mealTypes.length) params.set("meal_types", filters.mealTypes.join(","));
   if (filters.categories.length) params.set("categories", filters.categories.join(","));
   if (filters.wasteTypes?.length) params.set("waste_types", filters.wasteTypes.join(","));
+  if (filters.customerId) params.set("customer_id", filters.customerId);
   return params;
 }
 
@@ -131,7 +133,7 @@ export const dashboardApi = {
   getWeekdayWaste: (filters: DashboardFilters) => fetchJson<WeekdayPoint[]>("waste-by-weekday", filters),
   getTopDevices: (filters: DashboardFilters) => fetchJson<NamedValue[]>("top-devices", filters),
   getInsights: (filters: DashboardFilters) => fetchJson<DashboardInsights>("dashboard-insights", filters),
-  getFilterOptions: () => fetchJson<FilterOptions>("filter-options"),
+  getFilterOptions: (customerId?: string) => fetchJson<FilterOptions>("filter-options" + (customerId ? `?customer_id=${customerId}` : "")),
   getUsageAnalytics: (filters: DashboardFilters) => fetchJson<UsageAnalytics>("usage-analytics", filters),
   getBainMarieAnalytics: (filters: DashboardFilters) => fetchJson<BainMarieAnalytics>("bain-marie-analytics", filters),
   getDailyAvgByCategory: (filters: DashboardFilters) => fetchJson<NamedValue[]>("daily-avg-by-category", filters),
@@ -165,6 +167,7 @@ export const dashboardApi = {
       meal_types: filters.mealTypes.join(","),
       categories: filters.categories.join(","),
       waste_types: (filters.wasteTypes ?? []).join(","),
+      customer_id: filters.customerId,
     };
     const response = await fetch("/api/chat-query", {
       method: "POST",

@@ -30,9 +30,11 @@ const NAME_TO_SERIAL: Record<string, string> = Object.entries(DEVICE_NAMES).redu
 }, {} as Record<string, string>);
 
 export default function Index() {
-  const { data: filterOptions } = useDashboardFilterOptions();
-  
   const searchParams = new URLSearchParams(window.location.search);
+  const urlCustomerId = searchParams.get("customer_id") || undefined;
+  
+  const { data: filterOptions } = useDashboardFilterOptions(urlCustomerId);
+  
   const urlDevice = searchParams.get("device") || searchParams.get("devices");
   const dashboardDevices = urlDevice ? urlDevice.split(",").map(d => {
     const trimmed = d.trim();
@@ -52,6 +54,7 @@ export default function Index() {
       categories: [],
       weeks: [],
       wasteTypes: [],
+      customerId: urlCustomerId,
     };
   });
 
@@ -67,8 +70,9 @@ export default function Index() {
       categories: [],
       weeks: [],
       wasteTypes: [],
+      customerId: urlCustomerId,
     });
-  }, [filterOptions]);
+  }, [filterOptions, urlCustomerId]);
 
   const filters = useMemo(() => appliedFilters, [appliedFilters]);
   const dashboard = useDashboardData(filters);

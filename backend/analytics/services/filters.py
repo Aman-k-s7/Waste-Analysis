@@ -17,6 +17,7 @@ class FilterParams:
     waste_types: tuple[str, ...] = ()
     week: str | None = None
     weeks: tuple[str, ...] = ()
+    customer_id: int | None = None
 
 
 def _parse_date(raw_value: str | None, field_name: str) -> date | None:
@@ -56,6 +57,8 @@ def parse_filters(params: Mapping[str, str]) -> FilterParams:
     categories = _split_csv(params.get("categories"))
     waste_types = _split_csv(params.get("waste_types"))
     device = (params.get("device") or None)
+    customer_id_str = params.get("customer_id")
+    customer_id = int(customer_id_str) if customer_id_str and customer_id_str.isdigit() else None
 
     if week and not weeks:
         week_start, week_end = _parse_week_start(week)
@@ -76,6 +79,7 @@ def parse_filters(params: Mapping[str, str]) -> FilterParams:
         waste_types=waste_types,
         week=week,
         weeks=weeks,
+        customer_id=customer_id,
     )
 
 

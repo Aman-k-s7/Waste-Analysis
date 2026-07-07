@@ -3,10 +3,10 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { dashboardApi, type DashboardFilters } from "@/lib/dashboard";
 
 
-export function useDashboardFilterOptions() {
+export function useDashboardFilterOptions(customerId?: string) {
   return useQuery({
-    queryKey: ["dashboard-filter-options"],
-    queryFn: dashboardApi.getFilterOptions,
+    queryKey: ["dashboard-filter-options", customerId],
+    queryFn: () => dashboardApi.getFilterOptions(customerId),
   });
 }
 
