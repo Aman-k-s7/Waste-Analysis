@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { format, subMonths } from "date-fns";
 import { Printer } from "lucide-react";
 
 import AlertsAnomalies from "@/components/dashboard/AlertsAnomalies";
@@ -40,17 +41,27 @@ export default function Index() {
     return trimmed;
   }) : ["AGFW26010", "CFSO13"];
 
-  const [appliedFilters, setAppliedFilters] = useState<DashboardFilters>({
-    devices: dashboardDevices,
-    mealTypes: [],
-    categories: [],
-    weeks: [],
-    wasteTypes: [],
+  const [appliedFilters, setAppliedFilters] = useState<DashboardFilters>(() => {
+    const to = new Date();
+    const from = subMonths(to, 1);
+    return {
+      dateFrom: format(from, "yyyy-MM-dd"),
+      dateTo: format(to, "yyyy-MM-dd"),
+      devices: dashboardDevices,
+      mealTypes: [],
+      categories: [],
+      weeks: [],
+      wasteTypes: [],
+    };
   });
 
   useEffect(() => {
     if (!filterOptions) return;
+    const to = new Date();
+    const from = subMonths(to, 1);
     setAppliedFilters({
+      dateFrom: format(from, "yyyy-MM-dd"),
+      dateTo: format(to, "yyyy-MM-dd"),
       devices: dashboardDevices,
       mealTypes: [],
       categories: [],

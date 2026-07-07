@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { format } from "date-fns";
+import { format, subMonths } from "date-fns";
 import { CalendarIcon, ChevronDown, Filter, RotateCcw, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -146,8 +146,8 @@ interface FilterSidebarProps {
 
 
 export default function FilterSidebar({ options, onApply }: FilterSidebarProps) {
-  const [dateFrom, setDateFrom] = useState<Date | undefined>();
-  const [dateTo, setDateTo] = useState<Date | undefined>();
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(() => subMonths(new Date(), 1));
+  const [dateTo, setDateTo] = useState<Date | undefined>(() => new Date());
   const [devices, setDevices] = useState<string[]>(getInitialDevices());
   const [meals, setMeals] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -156,8 +156,8 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
 
   useEffect(() => {
     if (!options) return;
-    setDateFrom(undefined);
-    setDateTo(undefined);
+    setDateFrom(subMonths(new Date(), 1));
+    setDateTo(new Date());
     setDevices(getInitialDevices());
     setMeals([]);
     setCategories([]);
@@ -207,14 +207,18 @@ export default function FilterSidebar({ options, onApply }: FilterSidebarProps) 
   };
 
   const reset = () => {
-    setDateFrom(undefined);
-    setDateTo(undefined);
+    const defaultFrom = subMonths(new Date(), 1);
+    const defaultTo = new Date();
+    setDateFrom(defaultFrom);
+    setDateTo(defaultTo);
     setDevices(getInitialDevices());
     setMeals([]);
     setCategories([]);
     setWeeks([]);
     setWasteTypes([]);
     onApply({
+      dateFrom: format(defaultFrom, "yyyy-MM-dd"),
+      dateTo: format(defaultTo, "yyyy-MM-dd"),
       devices: getInitialDevices(),
       mealTypes: [],
       categories: [],
