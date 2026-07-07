@@ -81,7 +81,7 @@ export default function Index() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <FilterSidebar options={filterOptions} onApply={setAppliedFilters} />
+      <FilterSidebar options={filterOptions} onApply={(newFilters) => setAppliedFilters(prev => ({ ...newFilters, customerId: prev.customerId }))} />
 
       <main className="flex-1 overflow-y-auto">
         <div className="px-8 pt-6 pb-4 border-b border-border bg-card print:hidden-header">
