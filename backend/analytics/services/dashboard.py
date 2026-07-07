@@ -56,6 +56,8 @@ def _where_clause(
     require_created_on_date: bool = True,
 ) -> tuple[str, list]:
     actual_company_ids = [filters.customer_id] if filters.customer_id is not None else COMPANY_IDS
+    if not actual_company_ids:
+        actual_company_ids = [-1]
     placeholders = ", ".join(["%s"] * len(actual_company_ids))
     clauses = [f"company_id IN ({placeholders})", "is_valid = 1"]
     if require_commodity:
@@ -463,6 +465,8 @@ def get_top_devices(filters: FilterParams, limit: int = 5) -> list[dict]:
 
 def get_filter_options(filters: FilterParams) -> dict:
     actual_company_ids = [filters.customer_id] if filters.customer_id is not None else COMPANY_IDS
+    if not actual_company_ids:
+        actual_company_ids = [-1]
     placeholders = ", ".join(["%s"] * len(actual_company_ids))
     base_where = f"WHERE company_id IN ({placeholders}) AND created_on_date IS NOT NULL"
     base_params: list = list(actual_company_ids)
