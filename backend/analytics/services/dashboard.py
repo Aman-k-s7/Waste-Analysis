@@ -6,7 +6,7 @@ from django.db import connection
 
 
 SCAN_TABLE = os.getenv("WASTE_SCAN_TABLE", "scm_scans")
-COMPANY_ID = int(os.getenv("WASTE_COMPANY_ID", "312"))
+COMPANY_IDS = [int(cid.strip()) for cid in os.getenv("WASTE_COMPANY_ID", "312").split(",") if cid.strip().isdigit()]
 WEIGHT_MULTIPLIER = float(os.getenv("WASTE_WEIGHT_MULTIPLIER", "100"))
 ABNORMAL_MULTIPLIER = float(os.getenv("WASTE_ABNORMAL_MULTIPLIER", "1.2"))
 FIXED_DEVICE_SERIALS = [s.strip() for s in os.getenv("WASTE_FIXED_DEVICE_SERIAL", "AGFW26010,CFSO13").split(",") if s.strip()]
@@ -55,13 +55,14 @@ def _where_clause(
     require_commodity: bool = True,
     require_created_on_date: bool = True,
 ) -> tuple[str, list]:
-    actual_company_id = filters.customer_id if filters.customer_id is not None else COMPANY_ID
-    clauses = ["company_id = %s", "is_valid = 1"]
+    actual_company_ids = [filters.customer_id] if filters.customer_id is not None else COMPANY_IDS
+    placeholders = ", ".join(["%s"] * len(actual_company_ids))
+    clauses = [f"company_id IN ({placeholders})", "is_valid = 1"]
     if require_commodity:
         clauses.append("commodity_name IS NOT NULL")
     if require_created_on_date:
         clauses.append("created_on_date IS NOT NULL")
-    params: list = [actual_company_id]
+    params: list = list(actual_company_ids)
 
     if filters.date_from:
         clauses.append("created_on_date >= %s")
@@ -461,9 +462,10 @@ def get_top_devices(filters: FilterParams, limit: int = 5) -> list[dict]:
 
 
 def get_filter_options(filters: FilterParams) -> dict:
-    actual_company_id = filters.customer_id if filters.customer_id is not None else COMPANY_ID
-    base_where = "WHERE company_id = %s AND created_on_date IS NOT NULL"
-    base_params: list = [actual_company_id]
+    actual_company_ids = [filters.customer_id] if filters.customer_id is not None else COMPANY_IDS
+    placeholders = ", ".join(["%s"] * len(actual_company_ids))
+    base_where = f"WHERE company_id IN ({placeholders}) AND created_on_date IS NOT NULL"
+    base_params: list = list(actual_company_ids)
     if FIXED_DEVICE_SERIALS:
         placeholders = ", ".join(["%s"] * len(FIXED_DEVICE_SERIALS))
         base_where += f" AND device_serial_no IN ({placeholders})"
