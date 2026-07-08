@@ -518,7 +518,7 @@ def get_filter_options(filters: FilterParams) -> dict:
     categories = [row["value"] for row in _fetch_all(categories_sql, base_params)]
     waste_types = [row["value"] for row in _fetch_all(waste_types_sql, base_params)]
     date_range = _fetch_one(range_sql, base_params)
-    weeks = get_weekly_waste(FilterParams(devices=tuple(FIXED_DEVICE_SERIALS)))
+    weeks = get_weekly_waste(FilterParams(devices=tuple(FIXED_DEVICE_SERIALS), customer_id=filters.customer_id))
 
     return {
         "devices": devices,
@@ -730,6 +730,7 @@ def get_bain_marie_analytics(filters: FilterParams) -> dict:
         waste_types=(bain_marie_type,),
         week=filters.week,
         weeks=filters.weeks,
+        customer_id=filters.customer_id,
     )
     where_sql, params = _where_clause(bm_filters)
 
